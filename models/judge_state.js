@@ -78,16 +78,16 @@ class JudgeState extends Model {
 
 		if (user && user.id === this.problem.user_id) return true;
 		// The user is the creator of the problem.
-		else if (user && user.id === this.user_id) return true;
+		if (user && user.id === this.user_id) return true;
 		// The user is the submitter.
-		else if (this.type === 0) {
+		if (this.type === 0) {
 			return await this.problem.isAllowedUseBy(user);
 		}
 		// Normal submission
 		// 1. The problem is public and not protected
 		// 2. The problem is public and the user is indoor student/student admin
 		// 3. The the user is teacher/system admin
-		else if (this.type === 1) {
+		if (this.type === 1) {
 			let contest = await Contest.fromID(this.type_info);
 			if (await contest.isRunning()) {
 				return ((user && user.admin >= 3) || (user && user.id === contest.holder_id));
@@ -163,11 +163,11 @@ class JudgeState extends Model {
 
 		if (user && user.id === this.problem.user_id) return true;
 		// The user is the creator of the problem
-		else if (this.type === 0) return this.problem.is_public || (user && (await user.admin >= 3));
+		if (this.type === 0) return this.problem.is_public || (user && (await user.admin >= 3));
 		// Normal submission
 		// 1. The problem is public
 		// 2. The user is teacher/system admin
-		else if (this.type === 1) {
+		if (this.type === 1) {
 			let contest = await Contest.fromID(this.type_info);
 			if (await contest.isRunning()) {
 				return (user && user.admin >= 3) || (user && user.id === contest.holder_id);
