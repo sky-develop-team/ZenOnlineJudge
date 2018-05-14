@@ -30,17 +30,17 @@ app.get('/submissions', async (req, res) => {
 
 		where.type = { $ne: 1 };
 
-		if (!res.locals.user || !await res.locals.user.admin >= 3) {
+		if (!res.locals.user || !(res.locals.user.admin >= 3)) {
 			if (req.query.problem_id) {
 				where.problem_id = {
 					$and: [
-						{ $in: zoj.db.literal('(SELECT `id` FROM `problem` WHERE `is_public` = 1' + (res.locals.user ? (' OR `user_id` = ' + res.locals.user.id) : '') + ')') },
+						{ $in: zoj.db.literal('(SELECT `id` FROM `problem` WHERE (`is_public` = 1' + (!res.locals.user || res.locals.user.admin < 1 ? ' AND `is_protected` = 0)' : ')') + (res.locals.user ? (' OR `user_id` = ' + res.locals.user.id) : '') + ')') },
 						{ $eq: where.problem_id = parseInt(req.query.problem_id) || -1 }
 					]
 				};
 			} else {
 				where.problem_id = {
-					$in: zoj.db.literal('(SELECT `id` FROM `problem` WHERE `is_public` = 1' + (res.locals.user ? (' OR `user_id` = ' + res.locals.user.id) : '') + ')'),
+					$in: zoj.db.literal('(SELECT `id` FROM `problem` WHERE (`is_public` = 1' + (!res.locals.user || res.locals.user.admin < 1 ? ' AND `is_protected` = 0)' : ')') + (res.locals.user ? (' OR `user_id` = ' + res.locals.user.id) : '') + ')'),
 				};
 			}
 		} else {
